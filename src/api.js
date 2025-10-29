@@ -1,5 +1,5 @@
 // --- CORRECCIÓN: Usamos la URL completa del servidor para evitar problemas de conexión (CORS / Failed to fetch) ---
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = 'https://chat-backend-zjq4.onrender.com';
 
 export const registerUser = async (data) => {
   const res = await fetch(`${API_BASE}/auth/register`, {
