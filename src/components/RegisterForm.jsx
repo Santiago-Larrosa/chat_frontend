@@ -1,36 +1,34 @@
-import React, { useState } from 'react';
-import './AuthForms.css';
+import { useState } from 'react';
+// 1. Asegúrate de que importa la función de api.js
+// CORRECCIÓN: La ruta correcta es ../../api.js (asumiendo que api.js está en la raíz, fuera de 'src/')
+import { registerUser } from '../../api.js'; 
 
-
-const RegisterForm = ({ onRegister }) => {
+function RegisterForm({ onRegister }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState('alumno'); // Estado para el tipo de usuario
+  const [userType, setUserType] = useState('alumno');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // 2. ¡ESTA LÍNEA ES LA SOLUCIÓN CRÍTICA!
+    // Previene que el formulario recargue la página.
+    e.preventDefault(); 
+    
     setError('');
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', { // Asegúrate que la URL sea la correcta
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password, userType }),
+      // 3. Llama a la función de la API (con la URL de Render)
+      const data = await registerUser({ 
+        username, 
+        email, 
+        password, 
+        userType 
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Error en el registro');
-      }
-      
-      onRegister(data); // Pasamos todos los datos del usuario al App.jsx
+      onRegister(data); // Avisa a App.jsx que el registro fue exitoso
 
     } catch (err) {
       setError(err.message);
@@ -40,7 +38,7 @@ const RegisterForm = ({ onRegister }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', margin: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', margin: 'auto' }}>
       <h2>Registro</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <input
@@ -67,23 +65,25 @@ const RegisterForm = ({ onRegister }) => {
         required
         style={{ marginBottom: '10px', padding: '8px' }}
       />
-      {/* Menú desplegable para seleccionar el tipo de usuario */}
       <select 
         value={userType} 
-        onChange={(e) => setUserType(e.target.value)}
+        onChange={(e) => setUserType(e.target.value)} 
         required
         style={{ marginBottom: '10px', padding: '8px' }}
       >
         <option value="alumno">Alumno</option>
         <option value="profesor">Profesor</option>
         <option value="preceptor">Preceptor</option>
+        {/* AÑADIDO: La opción DOE que tenías */}
         <option value="DOE">DOE</option>
       </select>
       <button type="submit" disabled={loading} style={{ padding: '10px' }}>
         {loading ? 'Registrando...' : 'Registrarse'}
       </button>
-    </form>
+    </div>
   );
-};
+}
 
 export default RegisterForm;
+
+
